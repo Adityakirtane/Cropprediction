@@ -3,6 +3,29 @@ import numpy as np
 import pandas
 import sklearn
 import pickle
+import pandas as pd
+import joblib
+import os
+from sklearn.preprocessing import StandardScaler
+print("Template directory:", os.path.abspath("templates"))
+# Load the dataset
+df = pd.read_csv("Crop_recommendation.csv")  # Ensure the file exists in your project directory
+
+# Select the features used for training
+features = ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]  # Update these if necessary
+X = df[features]
+
+# Initialize and fit the scaler
+scaler = StandardScaler()
+scaler.fit(X)
+
+# Save the new scaler
+joblib.dump(scaler, "standard_scaler.pkl")
+
+print("Scaler retrained and saved successfully.")
+
+import warnings
+warnings.simplefilter("ignore", UserWarning)
 
 # importing model
 model = pickle.load(open('model.pkl','rb'))
@@ -10,7 +33,7 @@ sc = pickle.load(open('standscaler.pkl','rb'))
 ms = pickle.load(open('minmaxscaler.pkl','rb'))
 
 # creating flask app
-app = Flask(__name__)
+app = Flask(__name__, template_folder="templates")
 
 @app.route('/')
 def index():
@@ -50,4 +73,4 @@ def predict():
 
 # python main
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True,port=8000)
